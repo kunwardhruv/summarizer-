@@ -24,7 +24,7 @@
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/yourusername/summazier.git
+git clone https://github.com/kunwardhruv/summazier.git
 cd summazier
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
@@ -192,7 +192,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Development Setup
 
 ```bash
-git clone https://github.com/yourusername/summazier.git
+git clone https://github.com/kunwardhruv/summazier.git
 cd summazier
 python -m venv .venv
 source .venv/bin/activate
@@ -213,9 +213,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/summazier/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/summazier/discussions)
-- 📧 **Email**: kunwarrdhruv@gmail.com.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/kunwardhruv/summazier/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/kunwardhruv/summazier/discussions)
+- 📧 **Email**: kunwarrdhruv@gmail.com
 
 ---
 
