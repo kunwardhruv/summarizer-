@@ -20,7 +20,7 @@
 
 ## 🚀 Quick Start
 
-### Option 1: Web UI (Recommended)
+### Option 1: FastAPI Web UI (Local, free with Ollama)
 
 ```bash
 # 1. Clone and setup
@@ -41,7 +41,23 @@ python run_web.py
 # Upload any PDF and get instant analysis! 🎉
 ```
 
-### Option 2: OpenAI (Faster)
+### Option 2: Streamlit UI (Polished dashboard)
+
+```bash
+# 1. Clone and setup (if not already)
+git clone https://github.com/kunwardhruv/summazier.git
+cd summazier
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+
+# 2. Run Streamlit app
+python -m streamlit run streamlit_app.py
+
+# 3. Open browser: http://localhost:8501
+```
+
+### Option 3: OpenAI (Faster, paid)
 
 ```bash
 # Set your API key
@@ -63,7 +79,7 @@ python -m summazier.cli --id 1706.03762 --model gpt-4o-mini --save_json
 
 ```bash
 # Analyze by arXiv ID
-python -m summazier.cli --id 1706.03762 --provider ollama --model llama3.1:8b
+python -m summazier.cli --id 1706.03762 --provider ollama --model llama3.2:1b
 
 # Search and analyze
 python -m summazier.cli --query "protein structure prediction" --top_k 1
@@ -99,7 +115,7 @@ MAX_WORDS=300
 
 | Provider | Models | Speed | Cost |
 |----------|--------|-------|------|
-| **Ollama** | `llama3.1:8b`, `llama3.1:7b`, `llama3.1:3b` | Medium | Free |
+| **Ollama** | `llama3.2:1b`, `llama3.2:3b`, `llama3.1:8b` | Medium–Fast | Free |
 | **OpenAI** | `gpt-4o-mini`, `gpt-4o`, `gpt-3.5-turbo` | Fast | Paid |
 
 ## 🏗️ Architecture
@@ -107,6 +123,7 @@ MAX_WORDS=300
 ```
 summazier/
 ├── 📄 web.py              # FastAPI web interface
+├── 📊 streamlit_app.py    # Streamlit dashboard UI
 ├── 🔧 cli.py              # Command-line interface  
 ├── 🧠 pipeline.py         # Core analysis pipeline
 ├── 📝 prompts.py          # AI prompt templates
@@ -163,6 +180,11 @@ result = run_pipeline_sync(
     model="llama3.1:8b"
 )
 ```
+
+## ⚡ Performance Tuning & Faster Local Models
+
+Need better speed for local inference? See the full guide: [docs/performance.md](docs/performance.md)
+
 
 ## 🐛 Troubleshooting
 

@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from .config import AppConfig, ensure_directories_exist
 from .pdf_utils import extract_text_from_pdf, split_into_sections
-from .pipeline import run_pipeline_sync
+from .pipeline import run_pipeline_sync, run_pipeline_async
 
 app = FastAPI(title="Summazier - Research Paper Summarizer")
 
@@ -85,7 +85,7 @@ async def home():
                     </div>
                     <div class="form-group">
                         <label for="model">Model:</label>
-                        <input type="text" id="model" name="model" value="llama3.1:8b" placeholder="llama3.1:8b">
+                        <input type="text" id="model" name="model" value="llama3.2:1b" placeholder="llama3.2:1b">
                     </div>
                     <div class="form-group">
                         <label for="sections">Sections to Analyze:</label>
@@ -154,11 +154,15 @@ async def analyze_paper(
     pdf_file: UploadFile = File(...),
     role: str = Form("You are a research analyst in biomedical AI. Your outputs must be rigorous, concise, faithful to the paper, and useful for downstream research."),
     provider: str = Form("ollama"),
-    model: str = Form("llama3.1:8b"),
+    model: str = Form("llama3.2:1b"),
     sections: str = Form("abstract,methods,results,discussion"),
     max_words: int = Form(0),
     num_questions: int = Form(5),
 ):
+    import traceback
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
         # Load config
         config = AppConfig.from_env()
@@ -179,17 +183,32 @@ async def analyze_paper(
             only_sections = [s.strip().lower() for s in sections.split(',') if s.strip()]
             
             # Run pipeline (no word limit enforced)
-            result = run_pipeline_sync(
-                config=config,
-                sections=sections_map,
-                role=role,
-                model=model,
-                max_words=0,
-                num_questions=num_questions,
-                provider=provider,
-                base_url="http://localhost:11434" if provider == "ollama" else None,
-                only_sections=only_sections,
-            )
+            # Prefer async (concurrent) flow for providers that support async calls.
+            # We now use async for both OpenAI and Ollama to parallelize section summaries.
+            if provider in ("openai", "ollama"):
+                result = await run_pipeline_async(
+                    config=config,
+                    sections=sections_map,
+                    role=role,
+                    model=model,
+                    max_words=0,
+                    num_questions=num_questions,
+                    provider=provider,
+                    base_url="http://localhost:11434" if provider == "ollama" else None,
+                    only_sections=only_sections,
+                )
+            else:
+                result = run_pipeline_sync(
+                    config=config,
+                    sections=sections_map,
+                    role=role,
+                    model=model,
+                    max_words=0,
+                    num_questions=num_questions,
+                    provider=provider,
+                    base_url="http://localhost:11434" if provider == "ollama" else None,
+                    only_sections=only_sections,
+                )
             
             return {
                 "success": True,
@@ -204,6 +223,7 @@ async def analyze_paper(
             os.unlink(tmp_path)
             
     except Exception as e:
+        logger.error(f"Analysis failed: {str(e)}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 

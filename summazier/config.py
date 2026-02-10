@@ -13,7 +13,7 @@ load_dotenv(override=False)
 class AppConfig:
     openai_api_key: str
     openai_model: str = "gpt-4o-mini"
-    provider: str = "openai"  # "openai" or "ollama"
+    provider: str = "ollama"  # "openai" or "ollama" - defaults to ollama for local development
     base_url: str | None = None  # e.g., http://localhost:11434 for Ollama
     default_role: str = (
         "You are a research analyst in biomedical AI. Your outputs must be rigorous, "
@@ -25,10 +25,16 @@ class AppConfig:
 
     @staticmethod
     def from_env() -> "AppConfig":
-        provider = os.getenv("PROVIDER", "openai").strip().lower()
+        provider = os.getenv("PROVIDER", "ollama").strip().lower()  # Default to ollama for local development
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
+        
+        # If using OpenAI without API key, raise a clear error
         if provider == "openai" and not api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set. Provide it via env or .env, or set PROVIDER=ollama.")
+            raise RuntimeError(
+                "OPENAI_API_KEY is not set. Please provide it via environment variable or .env file. "
+                "Alternatively, set PROVIDER=ollama to use a local Ollama instance."
+            )
+        
         return AppConfig(
             openai_api_key=api_key,
             openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
