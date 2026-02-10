@@ -8,9 +8,15 @@ import json
 
 import streamlit as st
 
-from summazier.config import AppConfig, ensure_directories_exist
-from summazier.pdf_utils import extract_text_from_pdf, split_into_sections
-from summazier.pipeline import run_pipeline_sync, run_pipeline_async
+# Support both local package name `summazier` and a possible `summarizer` package name
+try:
+    from summazier.config import AppConfig, ensure_directories_exist
+    from summazier.pdf_utils import extract_text_from_pdf, split_into_sections
+    from summazier.pipeline import run_pipeline_sync, run_pipeline_async
+except ImportError:  # pragma: no cover - fallback for alternative package name on some deployments
+    from summarizer.config import AppConfig, ensure_directories_exist  # type: ignore
+    from summarizer.pdf_utils import extract_text_from_pdf, split_into_sections  # type: ignore
+    from summarizer.pipeline import run_pipeline_sync, run_pipeline_async  # type: ignore
 
 
 def parse_sections_input(sections_str: str) -> List[str]:
